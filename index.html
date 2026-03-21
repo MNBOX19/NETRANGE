@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
+    
+    <title>IPTV NETRANGE [VIP DNS EDITION]</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-deep: #000000;
+            --main-color: #FF8C00; /* Laranja Agressivo */
+            --font-xs: 1.8vh; --font-sm: 2.2vh; --font-md: 3vh; --font-lg: 5vh;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; user-select: none; }
+        
+        html, body {
+            background: transparent; /* Transparente para ver o player nativo no fundo */
+            color: #ffffff; font-family: 'Montserrat', sans-serif;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; 
+            overflow: hidden !important;
+        }
+
+        .hide { display: none !important; }
+        .flex-center { display: flex; align-items: center; justify-content: center; }
+        .layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; background: #000; overflow: hidden; }
+
+        button, .smart-card, .cat-item, .item, .power-btn, .key, .toggle-btn { cursor: pointer; }
+        
+        .focused { 
+            border: 3px solid #fff !important; background: var(--main-color) !important; color: #000 !important; 
+            z-index: 50; transform: scale(1.02) !important;
+        }
+        .focused i, .focused span, .focused div { color: #000 !important; }
+        
+        #vid-box.focused { border: 4px solid var(--main-color) !important; background: transparent !important; transform: none !important; }
+        #vid-box.fs, #vid-box.fs.focused { border: none !important; width: 100% !important; height: 100% !important; z-index: 9999 !important; position: fixed !important; top: 0 !important; left: 0 !important; background: transparent !important; transform: none !important; }
+
+        .login-box { width: 450px; max-width: 90%; padding: 40px; background: #0a0a0a; border: 2px solid var(--main-color); border-radius: 12px; text-align: center; }
+        .logo-txt { font-size: 4.5vh; font-weight: 900; margin-bottom: 2.5vh; }
+        .theme-text { color: var(--main-color); }
+        .inp { width: 100%; padding: 16px; margin: 10px 0; background: #1a1a1a; border: 1px solid #333; color: #fff; text-align: center; font-weight: 600; border-radius: 8px; font-size: 16px; }
+        .btn { width: 100%; padding: 16px; margin-top: 20px; background: var(--main-color); color: #000; border: none; font-weight: 900; border-radius: 8px; font-size: 16px; }
+
+        .config-row { display: flex; gap: 1vw; margin: 2vh 0; }
+        .toggle-btn { flex: 1; padding: 1.5vh; background: #1a1a1a; border: 1px solid #333; color: #888; font-size: var(--font-sm); font-weight: 800; border-radius: 1vh; }
+        .info-row { display: flex; justify-content: space-between; padding: 1vh 0; border-bottom: 1px solid #222; font-size: var(--font-sm); color: #ccc; }
+        
+        #dash-layer { display: flex; flex-direction: column; padding: 4vh 4vw; height: 100%; overflow: hidden; background: #000; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; height: 14vh; margin-bottom: 2vh; flex-shrink: 0; }
+        .dash-logo { font-size: var(--font-lg); font-weight: 900; }
+        .dash-clock { text-align: right; }
+        .clock-time { font-size: 6vh; font-weight: 700; color: #eee; line-height: 1; }
+        .clock-date { font-size: 2.5vh; color: #ccc; font-weight: 600; margin-top: 0.8vh; }
+        
+        .top-actions { display: flex; gap: 2vh; }
+        .power-btn { width: 7vh; height: 7vh; font-size: 3.5vh; background: transparent; border: none; color: #666; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+
+        .dash-grid { display: flex; gap: 4vw; justify-content: center; align-items: center; flex: 1; width: 100%; }
+        .smart-card { width: 24vw; height: 50vh; background: #101010; border: 1px solid #333; border-radius: 2.5vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .smart-card i { font-size: 15vh; margin-bottom: 4vh; color: #444; }
+        .smart-card span { font-size: 3.5vh; font-weight: 900; color: #fff; text-transform: uppercase; }
+        .bottom-bar { display: flex; justify-content: space-between; margin-top: auto; padding-bottom: 1vh; flex-shrink: 0; }
+        .info-pill { background: #111; padding: 1.5vh 2.5vw; border-radius: 50px; border: 1px solid #222; }
+        .lbl { font-size: var(--font-xs); color: #999; display: block; font-weight: 700; }
+        .val { font-size: var(--font-md); color: var(--main-color); font-weight: 900; }
+
+        #content-layer { display: flex; width: 100%; height: 100%; background: #000; overflow: hidden; }
+        .col-cat { width: 25%; background: #08080a; display: flex; flex-direction: column; border-right: 2px solid #1a1a1a; height: 100%; overflow: hidden; }
+        .col-list { width: 35%; background: #101014; display: flex; flex-direction: column; border-right: 2px solid #1a1a1a; height: 100%; overflow: hidden; }
+        
+        /* Fundo transparente aqui é CRÍTICO para ver o Object por baixo */
+        .col-play { flex: 1; display: flex; flex-direction: column; position: relative; background: transparent; height: 100%; overflow: hidden; }
+
+        .cat-head { padding: 15px; background: #15151a; color: var(--main-color); border-bottom: 2px solid #222; text-align: center; font-size: var(--font-md); font-weight: 900; flex-shrink: 0; }
+        .cat-top-row { display: flex; align-items: center; width: 100%; }
+        .btn-voltar { width: 4vh; height: 4vh; border-radius: 50%; border: 2px solid var(--main-color); display: flex; align-items: center; justify-content: center; font-size: var(--font-sm); margin-right: 1vw; color: var(--main-color); }
+        
+        .cat-list, .item-list { flex: 1; height: 100%; overflow-y: auto; }
+        .cat-item, .item { padding: 14px 20px; border-radius: 6px; margin: 6px 12px; color: #888; font-size: var(--font-sm); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border: 1px solid transparent; }
+        .cat-item.active { background: #1a1a1a; color: #fff; border-left: 4px solid var(--main-color); }
+        
+        .search-area { padding: 15px; background: #050505; border-bottom: 2px solid #1a1a1a; flex-shrink: 0; }
+        .inp-search { width: 100%; padding: 12px; background: #111; border: 1px solid #333; color: #fff; font-size: var(--font-sm); font-weight: bold; border-radius: 6px; text-transform: uppercase; text-align: center; }
+        
+        .item { border-bottom: 1px solid #1a1a1a; }
+        .item.playing { color: var(--main-color); background: #111; border-left: 4px solid var(--main-color); }
+
+        .vid-box { 
+            width: 100%; height: 50vh; background: transparent; position: relative; border-bottom: 2px solid #222; overflow: hidden; flex-shrink: 0;
+        }
+        
+        /* A MÁGICA DE HARDWARE NATIVO DA TV */
+        #player-container { width:100%; height:100%; background: transparent; }
+        object { width: 100%; height: 100%; background: transparent; z-index: -1; position: absolute; top:0; left:0; }
+
+        .buffer-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 50; display: none;
+            flex-direction: column; align-items: center; justify-content: center;
+        }
+
+        .meta { padding: 25px; flex: 1; height: 100%; overflow-y: auto; background: #0a0a0c; display: flex; flex-direction: column; }
+        .meta-title { font-size: var(--font-lg); color: var(--main-color); font-weight: 900; margin-bottom: 1vh; }
+        .meta-desc { font-size: var(--font-sm); color: #999; margin-bottom: 1vh; }
+        
+        .keys { display: flex; justify-content: space-between; align-items: center; gap: 1vw; padding-top: 2vh; border-top: 2px solid #1a1a1a; margin-top: auto; flex-shrink: 0; }
+        .key { flex: 1; font-size: var(--font-xs); color: #fff; font-weight: 700; background: #1a1a1a; border: 1px solid #333; padding: 1.2vh 0.5vw; border-radius: 0.8vh; display: flex; align-items: center; justify-content: center; }
+        .dot { width: 1.2vh; height: 1.2vh; border-radius: 50%; flex-shrink: 0; margin-right: 1.2vw; }
+
+        #loader { background: #000; z-index: 20000; flex-direction: column; color: var(--main-color); font-weight: 900; font-size: var(--font-lg); }
+        #pause-layer { display: none; position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 9000; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body onload="App.init()">
+
+    <div id="loader" class="hide flex-center">
+        <i class="fas fa-circle-notch fa-spin" style="margin-bottom:20px; font-size: 8vh;"></i>
+        <div id="load-txt">CARREGANDO SISTEMA...</div>
+    </div>
+
+    <div id="login-layer" class="layer flex-center hide">
+        <div class="login-box">
+            <div class="logo-txt"><span style="color:#fff">IPTV</span>&nbsp;<span class="theme-text">NETRANGE</span></div>
+            <input type="text" id="i0" class="inp focusable" placeholder="URL DNS" autocomplete="off">
+            <input type="text" id="i1" class="inp focusable" placeholder="USUÁRIO" autocomplete="off">
+            <input type="password" id="i2" class="inp focusable" placeholder="SENHA" autocomplete="off">
+            <button id="i3" class="btn focusable" onclick="App.login(false)">ENTRAR AGORA</button>
+            <div id="msg-login" style="color:var(--main-color); margin-top:20px; font-size:var(--font-sm); font-weight: 800;"></div>
+        </div>
+    </div>
+
+    <div id="settings-layer" class="layer hide flex-center">
+        <div class="login-box">
+            <button id="s4" class="btn focusable" onclick="App.closeSettings()" style="background: #333; color: #fff;">VOLTAR</button>
+        </div>
+    </div>
+
+    <div id="dash-layer" class="layer hide">
+        <div class="top-bar">
+            <div class="dash-logo"><span style="color:#fff">IPTV</span>&nbsp;<span class="theme-text">NETRANGE</span></div>
+            <div class="dash-clock"><div id="clock-time" class="clock-time">--:--</div></div>
+            <div class="top-actions"><div id="m4" class="power-btn focusable" onclick="App.logout()"><i class="fas fa-power-off"></i></div></div>
+        </div>
+        <div class="dash-grid">
+            <div id="m0" class="smart-card focusable" onclick="App.openMode('live')"><i class="fas fa-satellite-dish"></i><span id="dash-m0">TV AO VIVO</span></div>
+            <div id="m1" class="smart-card focusable" onclick="App.openMode('movie')"><i class="fas fa-film"></i><span id="dash-m1">FILMES</span></div>
+            <div id="m2" class="smart-card focusable" onclick="App.openMode('series')"><i class="fas fa-layer-group"></i><span id="dash-m2">SÉRIES</span></div>
+        </div>
+    </div>
+
+    <div id="content-layer" class="layer hide">
+        <div class="col-cat">
+            <div class="cat-head">MENU</div>
+            <div id="cat-list" class="cat-list"></div>
+        </div>
+        <div class="col-list">
+            <div class="search-area"><input type="text" id="search" class="inp-search focusable" placeholder="BUSCAR..."></div>
+            <div id="item-list" class="item-list"></div>
+        </div>
+        <div class="col-play">
+            <div id="vid-box" class="vid-box focusable">
+                <div id="player-container">
+                    <object id="player" type="application/avplayer"></object>
+                </div>
+                <div id="smart-buffer" class="buffer-overlay">
+                    <i class="fas fa-circle-notch fa-spin" style="font-size: 8vh; color: var(--main-color);"></i>
+                    <div id="buffer-text" style="color: #fff; margin-top: 10px; font-weight:bold;">CARREGANDO...</div>
+                </div>
+                <div id="pause-layer"><i class="fas fa-pause" style="font-size: 10vh; color: #fff;"></i></div>
+            </div>
+            
+            <div class="meta">
+                <div id="meta-title" class="meta-title"><span style="color:#fff">IPTV</span>&nbsp;NETRANGE</div>
+                <div id="meta-desc" class="meta-desc"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // O motor do player VIP
+        var PlayerEngine = {
+            video: null, url: null, monitorTimer: null, lastTime: 0, stallCount: 0, retryCount: 0,
+
+            init: function() { this.bindVideo(); },
+
+            bindVideo: function() {
+                this.video = document.getElementById('player');
+                if(!this.video) return;
+                
+                // Eventos Nativos de Smart TVs Antigas (NetRange/OIPF)
+                this.video.onPlayStateChange = function() {
+                    try {
+                        var state = PlayerEngine.video.playState;
+                        if (state === 1) { // Tocando
+                            PlayerEngine.hideBuffer();
+                        } else if (state === 5) { // Terminou
+                            PlayerEngine.destroy();
+                        } else if (state === 6) { // Erro
+                            PlayerEngine.handleError();
+                        } else if (state === 3 || state === 4) { // Conectando/Buffering
+                            PlayerEngine.showBuffer('CARREGANDO...');
+                        }
+                    } catch(e) {}
+                };
+            },
+
+            destroy: function() {
+                if (this.video) {
+                    try { this.video.stop(); } catch (e) {}
+                    try { this.video.data = ""; } catch(e) {}
+                }
+                this.url = null; this.hideBuffer();
+            },
+
+            play: function(url) {
+                if (!url) return;
+                this.destroy();
+                this.url = url; this.retryCount = 0;
+                
+                this.showBuffer('CONECTANDO...');
+                if(!this.video) this.bindVideo();
+
+                try {
+                    // Manda a URL direto pro processador
+                    this.video.data = url; 
+                    this.video.play(1); // Comando nativo play velocidade x1
+                } catch (e) { this.handleError(); }
+            },
+
+            showBuffer: function(msg) {
+                var el = document.getElementById('smart-buffer'); var txt = document.getElementById('buffer-text');
+                if(txt) txt.innerText = msg;
+                if(el) el.style.display = 'flex';
+            },
+            hideBuffer: function() { 
+                var el = document.getElementById('smart-buffer'); 
+                if(el) el.style.display = 'none'; 
+            },
+            
+            handleError: function() {
+                this.retryCount++;
+                if (this.retryCount < 5) {
+                    this.showBuffer('RECONECTANDO...');
+                    var savedUrl = this.url; this.destroy(); 
+                    setTimeout(function() { if (savedUrl) PlayerEngine.play(savedUrl); }, 3000);
+                } else {
+                    this.showBuffer('SINAL OFFLINE');
+                }
+            }
+        };
+
+        // ... O restante da lógica App.init(), req, loadContent continua igual ao script robusto que montamos ...
+        // Simplifiquei o HTML acima para focar apenas na mecânica da Tag VIP. No servidor, cole o JavaScript completo.
+    </script>
+</body>
+</html>
